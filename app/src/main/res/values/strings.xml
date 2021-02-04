@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">Card Info Finder</string>
+    <string name="capture_image">Analyze</string>
+    <string name="instruction">Position your debit/credit card numbers in front of the camera</string>
+    <string name="camera_permission_required">Camera permission is required for the app to function properly</string>
+    <string name="ask_again">Ask again</string>
+    <string name="accept_camera_permission">Accept camera permission</string>
 </resources>

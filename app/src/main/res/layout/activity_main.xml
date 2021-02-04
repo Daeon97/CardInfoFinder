@@ -2,17 +2,113 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:padding="@dimen/spacing"
     tools:context=".MainActivity">
 
-    <TextView
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Hello World!"
+        android:layout_marginVertical="@dimen/spacing"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toTopOf="@id/main_view_capture_button"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/main_view_position_instruction"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/spacing"
+            android:textStyle="italic"
+            android:visibility="visible" />
+
+        <androidx.camera.view.PreviewView
+            android:id="@+id/main_view_camera_preview"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/extra_large_spacing" />
+
+        <ImageView
+            android:id="@+id/main_view_image_preview"
+            android:layout_width="match_parent"
+            android:visibility="gone"
+            android:layout_height="@dimen/extra_large_spacing"/>
+
+        <com.facebook.shimmer.ShimmerFrameLayout
+            android:layout_width="wrap_content"
+            app:shimmer_auto_start="true"
+            android:layout_marginTop="@dimen/spacing"
+            android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/main_view_card_brand"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Card brand: Mastercard"
+            android:visibility="visible" />
+
+        </com.facebook.shimmer.ShimmerFrameLayout>
+
+        <com.facebook.shimmer.ShimmerFrameLayout
+            android:layout_width="wrap_content"
+            app:shimmer_auto_start="true"
+            android:layout_marginTop="@dimen/small_spacing"
+            android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/main_view_card_type"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Card type: Debit"
+            android:visibility="visible" />
+
+        </com.facebook.shimmer.ShimmerFrameLayout>
+
+        <com.facebook.shimmer.ShimmerFrameLayout
+            android:layout_width="wrap_content"
+            app:shimmer_auto_start="true"
+            android:layout_marginTop="@dimen/small_spacing"
+            android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/main_view_bank"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Bank: United Bank for Africa"
+            android:visibility="visible" />
+
+        </com.facebook.shimmer.ShimmerFrameLayout>
+
+        <com.facebook.shimmer.ShimmerFrameLayout
+            android:layout_width="wrap_content"
+            app:shimmer_auto_start="true"
+            android:layout_marginTop="@dimen/small_spacing"
+            android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/main_view_country"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Country: Nigeria"
+            android:visibility="visible" />
+
+        </com.facebook.shimmer.ShimmerFrameLayout>
+
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/main_view_capture_button"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/extra_large_spacing"
+        android:enabled="false"
+        android:text="@string/capture_image"
+        android:textAllCaps="false"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

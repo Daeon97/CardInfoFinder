@@ -3,4 +3,6 @@
     <dimen name="small_spacing">8dp</dimen>
     <dimen name="spacing">16dp</dimen>
     <dimen name="large_spacing">32dp</dimen>
+    <dimen name="extra_large_spacing">64dp</dimen>
+    <dimen name="extra_extra_large_spacing">128dp</dimen>
 </resources>
