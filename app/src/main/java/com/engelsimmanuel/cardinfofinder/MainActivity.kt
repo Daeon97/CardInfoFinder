@@ -1,16 +1,12 @@
 package com.engelsimmanuel.cardinfofinder
 
 import android.Manifest
-import android.content.Intent
 import android.content.pm.PackageManager
-import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.text.format.DateFormat
 import android.util.Log
 import android.view.View
 import android.widget.Button
-import android.widget.ImageView
 import android.widget.TextView
 import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
@@ -22,21 +18,20 @@ import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
 import com.facebook.shimmer.ShimmerFrameLayout
 import com.google.android.material.snackbar.Snackbar
+import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.textfield.TextInputLayout
 import com.google.firebase.ml.vision.FirebaseVision
 import com.google.firebase.ml.vision.common.FirebaseVisionImage
 import com.google.firebase.ml.vision.common.FirebaseVisionImageMetadata
-import java.io.File
-import java.nio.ByteBuffer
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
-
-typealias LumaListener = (luma: Double) -> Unit
 
 class MainActivity : AppCompatActivity() {
     private lateinit var viewFinder: PreviewView
     private lateinit var positionInstruction: TextView
-    private lateinit var imagePreview: ImageView
-    private lateinit var capture: Button
+    private lateinit var gottenCardDetailsTextInputLayout: TextInputLayout
+    private lateinit var gottenCardDetails: TextInputEditText
+    private lateinit var analyze: Button
     private lateinit var cardBrand: TextView
     private lateinit var cardType: TextView
     private lateinit var bank: TextView
@@ -48,7 +43,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var countryShimmer: ShimmerFrameLayout
 
     private var imageCapture: ImageCapture? = null
-    private lateinit var outputDirectory: File
     private lateinit var cameraExecutor: ExecutorService
 
     companion object {
@@ -63,8 +57,10 @@ class MainActivity : AppCompatActivity() {
 
         viewFinder = findViewById(R.id.main_view_camera_preview)
         positionInstruction = findViewById(R.id.main_view_position_instruction)
-        imagePreview = findViewById(R.id.main_view_image_preview)
-        capture = findViewById(R.id.main_view_capture_button)
+        gottenCardDetailsTextInputLayout =
+            findViewById(R.id.main_view_gotten_card_details_text_input_layout)
+        gottenCardDetails = findViewById(R.id.main_view_gotten_card_details)
+        analyze = findViewById(R.id.main_view_analyze_button)
         cardBrand = findViewById(R.id.main_view_card_brand)
         cardType = findViewById(R.id.main_view_card_type)
         bank = findViewById(R.id.main_view_bank)
@@ -74,11 +70,10 @@ class MainActivity : AppCompatActivity() {
         bankShimmer = findViewById(R.id.main_view_bank_shimmer)
         countryShimmer = findViewById(R.id.main_view_country_shimmer)
 
-        outputDirectory = getOutputDirectory()
         cameraExecutor = Executors.newSingleThreadExecutor()
 
-        capture.setOnClickListener {
-            //capturePhoto()
+        analyze.setOnClickListener {
+            analyzePhoto()
         }
 
         requestCameraPermission()
@@ -130,44 +125,39 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        // is this still necessary?
-    }
-
-    private fun getOutputDirectory(): File {
-        val mediaDir = externalMediaDirs.firstOrNull()?.let {
-            File(it, resources.getString(R.string.app_name)).apply { mkdirs() }
-        }
-        return if (mediaDir != null && mediaDir.exists()) mediaDir else filesDir
-    }
-
     private fun showCamera() {
-        capture.isEnabled = true
-        positionInstruction.text = getString(R.string.instruction)
-        positionInstruction.setTextColor(resources.getColor(android.R.color.holo_green_dark))
+        log("showCamera is called")
+
+        positionInstruction.text = getString(R.string.opening_camera)
+        positionInstruction.setTextColor(resources.getColor(android.R.color.holo_blue_dark))
 
         val cameraProviderFuture = ProcessCameraProvider.getInstance(this@MainActivity)
 
         cameraProviderFuture.addListener(
             {
+                log("cameraProviderFuture.addListener is called")
+
                 val cameraProvider: ProcessCameraProvider = cameraProviderFuture.get()
                 val preview = Preview.Builder()
                     .build()
                     .also {
+                        log("preview surface provider")
                         it.setSurfaceProvider(viewFinder.surfaceProvider)
                     }
 
                 imageCapture = ImageCapture.Builder()
                     .build()
+                log("imageCapture was just assigned")
 
                 val imageAnalyzer = ImageAnalysis.Builder()
                     .build()
                     .also {
-                        it.setAnalyzer(cameraExecutor, LuminosityAnalyzer { luma ->
-                            log("Average luminosity: $luma")
-                        })
+                        it.setAnalyzer(
+                            cameraExecutor,
+                            Analyzer()
+                        )
                     }
+                log("imageAnalyzer was just assigned")
 
                 val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
 
@@ -180,7 +170,15 @@ class MainActivity : AppCompatActivity() {
                         imageCapture,
                         imageAnalyzer
                     )
+
+                    positionInstruction.text = getString(R.string.instruction)
+                    positionInstruction.setTextColor(resources.getColor(android.R.color.holo_green_dark))
+                    log("cameraProvider was just bound to lifecycle")
+
                 } catch (e: Exception) {
+                    positionInstruction.text =
+                        getString(R.string.error_occurred_while_opening_camera)
+                    positionInstruction.setTextColor(resources.getColor(android.R.color.holo_red_dark))
                     log("error: $e")
                 }
             },
@@ -188,39 +186,31 @@ class MainActivity : AppCompatActivity() {
         )
     }
 
-    /*private fun capturePhoto() {
-        val imageCapture = imageCapture ?: return
-
-        val photoFile = File(
-            outputDirectory,
-            "${DateFormat.format(" dd-MMMM-yyyy hh:mm:ss a", System.currentTimeMillis())}.jpg"
-        )
-
-        val outputOptions = ImageCapture.OutputFileOptions.Builder(photoFile).build()
-
-        imageCapture.takePicture(
-            outputOptions,
-            ContextCompat.getMainExecutor(this@MainActivity),
-            object : ImageCapture.OnImageSavedCallback {
-                override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
-                    val savedUri = Uri.fromFile(photoFile)
-                    viewFinder.visibility = View.GONE
-                    imagePreview.visibility = View.VISIBLE
-                    imagePreview.setImageURI(savedUri)
-                    val message = "Photo capture succeeded: $savedUri"
-                    log(messageToLog = message)
-                }
-
-                override fun onError(exception: ImageCaptureException) {
-                    log("Photo capture failed: ${exception.message}")
-                }
-
-            })
-    }
-
     private fun analyzePhoto() {
-        //.
-    }*/
+        when (analyze.text.toString()) {
+            getString(R.string.analyze) -> {
+                // get text from text input edit text here
+                // make request with text as BIN
+                if (analyze.text.trim().toString().isEmpty()) {
+                    Snackbar.make(
+                        findViewById(R.id.main_view),
+                        getString(R.string.empty_text),
+                        Snackbar.LENGTH_SHORT
+                    ).show()
+                } else {
+                    makeRequest(gottenCardDetails.text?.trim().toString())
+                }
+            }
+            getString(R.string.enter_manually) -> {
+                positionInstruction.text = getString(R.string.enter_card_details)
+                positionInstruction.setTextColor(resources.getColor(android.R.color.holo_green_dark))
+                gottenCardDetailsTextInputLayout.visibility = View.VISIBLE
+                viewFinder.visibility = View.GONE
+                cameraExecutor.shutdown()
+                analyze.text = getString(R.string.analyze)
+            }
+        }
+    }
 
     override fun onDestroy() {
         super.onDestroy()
@@ -253,10 +243,10 @@ class MainActivity : AppCompatActivity() {
         bank.setBackgroundColor(resources.getColor(R.color.default_font_color))
         country.setBackgroundColor(resources.getColor(R.color.default_font_color))
 
-        cardBrandShimmer.startShimmer()
-        cardTypeShimmer.startShimmer()
-        bankShimmer.startShimmer()
-        countryShimmer.startShimmer()
+        cardBrandShimmer.showShimmer(true)
+        cardTypeShimmer.showShimmer(true)
+        bankShimmer.showShimmer(true)
+        countryShimmer.showShimmer(true)
     }
 
     private fun stopShimmerOnLoadSuccessful(
@@ -275,38 +265,58 @@ class MainActivity : AppCompatActivity() {
         bank.setBackgroundColor(resources.getColor(android.R.color.transparent))
         country.setBackgroundColor(resources.getColor(android.R.color.transparent))
 
-        cardBrandShimmer.stopShimmer()
-        cardTypeShimmer.stopShimmer()
-        bankShimmer.stopShimmer()
-        countryShimmer.stopShimmer()
+        cardBrandShimmer.hideShimmer()
+        cardTypeShimmer.hideShimmer()
+        bankShimmer.hideShimmer()
+        countryShimmer.hideShimmer()
     }
 
     private fun stopShimmer() {
-        cardBrandShimmer.stopShimmer()
-        cardTypeShimmer.stopShimmer()
-        bankShimmer.stopShimmer()
-        countryShimmer.stopShimmer()
+        cardBrandShimmer.hideShimmer()
+        cardTypeShimmer.hideShimmer()
+        bankShimmer.hideShimmer()
+        countryShimmer.hideShimmer()
     }
 
-    private fun makeRequest(bin: Int) {
-        startShimmerOnLoadStarted()
+    private fun makeRequest(bin: String) {
+        showLoadingCardDetails()
         val request = JsonObjectRequest(Request.Method.GET, String.format(ENDPOINT, bin), null, {
             log("response: $it")
+            stopShimmerOnLoadSuccessful(
+                cardBrandText = when (it.isNull("brand") || it.getString("brand").isNullOrEmpty()) {
+                    true -> "Card brand: UNKNOWN"
+                    false -> "Card brand: ${it.getString("brand")}"
+                },
+                cardTypeText = when (it.isNull("type") || it.getString("type").isNullOrEmpty()) {
+                    true -> "Card type: UNKNOWN"
+                    false -> "Card type: ${it.getString("type")}"
+                },
+                bankText = when (it.isNull("bank") || it.getJSONObject("bank")
+                    .isNull("name") || it.getJSONObject("bank")
+                    .getString("name").isNullOrEmpty()) {
+                    true -> "Bank: UNKNOWN"
+                    false -> "Bank: ${it.getJSONObject("bank").getString("name")}"
+                },
+                countryText = when (it.isNull("country") || it.getJSONObject("country")
+                    .isNull("name") || it.getJSONObject("country")
+                    .getString("name").isNullOrEmpty()) {
+                    true -> "Country: UNKNOWN"
+                    false -> "Country: ${it.getJSONObject("country").getString("name")}"
+                }
+            )
         }) {
             stopShimmer()
             Snackbar.make(
                 findViewById(R.id.main_view),
-                getString(R.string.an_error_occurred),
-                Snackbar.LENGTH_INDEFINITE
-            ).setAction(
-                getString(R.string.retry)
-            ) { makeRequest(bin) }.show()
+                getString(R.string.an_error_occurred_analyze_again),
+                Snackbar.LENGTH_SHORT
+            ).show()
         }
 
         Volley.newRequestQueue(this@MainActivity).add(request)
     }
 
-    private class LuminosityAnalyzer(private val listener: LumaListener) : ImageAnalysis.Analyzer {
+    inner class Analyzer : ImageAnalysis.Analyzer {
         private fun degreesToFirebaseRotation(degrees: Int): Int = when (degrees) {
             0 -> FirebaseVisionImageMetadata.ROTATION_0
             90 -> FirebaseVisionImageMetadata.ROTATION_90
@@ -315,38 +325,42 @@ class MainActivity : AppCompatActivity() {
             else -> Log.wtf(TAG, "Rotation must be 0, 90, 180 or 270")
         }
 
-        private fun ByteBuffer.toByteArray(): ByteArray {
-            rewind()
-            val data = ByteArray(remaining())
-            get(data)
-            return data
-        }
-
         @androidx.camera.core.ExperimentalGetImage
         override fun analyze(image: ImageProxy) {
+
+            log("analyze image is called")
+
             val mediaImage = image.image
             val imageRotation = degreesToFirebaseRotation(image.imageInfo.rotationDegrees)
-            if (mediaImage != null){
-                val firebaseVisionImage = FirebaseVisionImage.fromMediaImage(mediaImage, imageRotation)
-                val detector = FirebaseVision.getInstance().cloudTextRecognizer
-                detector.processImage(firebaseVisionImage).addOnSuccessListener {
 
-                    val resultText = it.text
-                    Log.wtf(TAG, "Task completed successfully $resultText")
+            log("imageRotation was just assigned")
+
+            if (mediaImage != null) {
+                val firebaseVisionImage =
+                    FirebaseVisionImage.fromMediaImage(mediaImage, imageRotation)
+                val detector = FirebaseVision.getInstance().cloudTextRecognizer
+
+                log("inside mediaImage != null, detector was just assigned")
+
+                detector.processImage(firebaseVisionImage).addOnSuccessListener {
+                    log("analyze image onSuccessListener")
+
+                    positionInstruction.text = getString(R.string.correct_card_details_mistakes)
+                    positionInstruction.setTextColor(resources.getColor(R.color.purple_500))
+                    gottenCardDetails.setText(it.text)
+                    gottenCardDetailsTextInputLayout.visibility = View.VISIBLE
+                    viewFinder.visibility = View.GONE
+                    cameraExecutor.shutdown()
+                    analyze.isEnabled = true
 
                 }.addOnFailureListener {
-                    Log.wtf(TAG, "Task failed with an exception ${it.message}")
+                    log("analyze image onFailureListener")
+                    positionInstruction.text = getString(R.string.exception_while_scanning_card)
+                    positionInstruction.setTextColor(resources.getColor(android.R.color.holo_red_dark))
+                    analyze.text = getString(R.string.enter_manually)
+                    analyze.isEnabled = true
                 }
             }
-
-            val buffer = image.planes[0].buffer
-            val data = buffer.toByteArray()
-            val pixels = data.map { it.toInt() and 0xFF }
-            val luma = pixels.average()
-
-            listener(luma)
-
-            image.close()
         }
     }
 }

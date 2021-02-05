@@ -13,7 +13,7 @@
         android:layout_height="wrap_content"
         android:layout_marginVertical="@dimen/spacing"
         android:orientation="vertical"
-        app:layout_constraintBottom_toTopOf="@id/main_view_capture_button"
+        app:layout_constraintBottom_toTopOf="@id/main_view_analyze_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -23,19 +23,28 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="@dimen/spacing"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
             android:textStyle="italic"
             android:visibility="visible" />
 
         <androidx.camera.view.PreviewView
             android:id="@+id/main_view_camera_preview"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/extra_large_spacing" />
+            android:layout_height="@dimen/extra_extra_large_spacing" />
 
-        <ImageView
-            android:id="@+id/main_view_image_preview"
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/main_view_gotten_card_details_text_input_layout"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/extra_large_spacing"
-            android:visibility="gone" />
+            android:layout_height="wrap_content"
+            android:visibility="gone">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/main_view_gotten_card_details"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/card_number" />
+
+        </com.google.android.material.textfield.TextInputLayout>
 
         <com.facebook.shimmer.ShimmerFrameLayout
             android:id="@+id/main_view_card_brand_shimmer"
@@ -50,6 +59,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Card brand: Mastercard"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                 android:textColor="@color/default_font_color"
                 android:visibility="visible" />
 
@@ -68,6 +78,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Card type: Debit"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                 android:textColor="@color/default_font_color"
                 android:visibility="visible" />
 
@@ -86,6 +97,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Bank: United Bank for Africa"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                 android:textColor="@color/default_font_color"
                 android:visibility="visible" />
 
@@ -104,6 +116,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Country: Nigeria"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                 android:textColor="@color/default_font_color"
                 android:visibility="visible" />
 
@@ -112,12 +125,12 @@
     </LinearLayout>
 
     <Button
-        android:id="@+id/main_view_capture_button"
+        android:id="@+id/main_view_analyze_button"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginBottom="@dimen/extra_large_spacing"
         android:enabled="false"
-        android:text="@string/analyze_image"
+        android:text="@string/analyze"
         android:textAllCaps="false"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
