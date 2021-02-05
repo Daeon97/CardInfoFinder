@@ -34,66 +34,78 @@
         <ImageView
             android:id="@+id/main_view_image_preview"
             android:layout_width="match_parent"
-            android:visibility="gone"
-            android:layout_height="@dimen/extra_large_spacing"/>
+            android:layout_height="@dimen/extra_large_spacing"
+            android:visibility="gone" />
 
         <com.facebook.shimmer.ShimmerFrameLayout
+            android:id="@+id/main_view_card_brand_shimmer"
             android:layout_width="wrap_content"
-            app:shimmer_auto_start="true"
+            android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/spacing"
-            android:layout_height="wrap_content">
+            android:visibility="gone"
+            app:shimmer_auto_start="false">
 
-        <TextView
-            android:id="@+id/main_view_card_brand"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Card brand: Mastercard"
-            android:visibility="visible" />
-
-        </com.facebook.shimmer.ShimmerFrameLayout>
-
-        <com.facebook.shimmer.ShimmerFrameLayout
-            android:layout_width="wrap_content"
-            app:shimmer_auto_start="true"
-            android:layout_marginTop="@dimen/small_spacing"
-            android:layout_height="wrap_content">
-
-        <TextView
-            android:id="@+id/main_view_card_type"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Card type: Debit"
-            android:visibility="visible" />
+            <TextView
+                android:id="@+id/main_view_card_brand"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Card brand: Mastercard"
+                android:textColor="@color/default_font_color"
+                android:visibility="visible" />
 
         </com.facebook.shimmer.ShimmerFrameLayout>
 
         <com.facebook.shimmer.ShimmerFrameLayout
-            android:layout_width="wrap_content"
-            app:shimmer_auto_start="true"
-            android:layout_marginTop="@dimen/small_spacing"
-            android:layout_height="wrap_content">
-
-        <TextView
-            android:id="@+id/main_view_bank"
+            android:id="@+id/main_view_card_type_shimmer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Bank: United Bank for Africa"
-            android:visibility="visible" />
+            android:layout_marginTop="@dimen/small_spacing"
+            android:visibility="gone"
+            app:shimmer_auto_start="false">
+
+            <TextView
+                android:id="@+id/main_view_card_type"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Card type: Debit"
+                android:textColor="@color/default_font_color"
+                android:visibility="visible" />
 
         </com.facebook.shimmer.ShimmerFrameLayout>
 
         <com.facebook.shimmer.ShimmerFrameLayout
-            android:layout_width="wrap_content"
-            app:shimmer_auto_start="true"
-            android:layout_marginTop="@dimen/small_spacing"
-            android:layout_height="wrap_content">
-
-        <TextView
-            android:id="@+id/main_view_country"
+            android:id="@+id/main_view_bank_shimmer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Country: Nigeria"
-            android:visibility="visible" />
+            android:layout_marginTop="@dimen/small_spacing"
+            android:visibility="gone"
+            app:shimmer_auto_start="false">
+
+            <TextView
+                android:id="@+id/main_view_bank"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Bank: United Bank for Africa"
+                android:textColor="@color/default_font_color"
+                android:visibility="visible" />
+
+        </com.facebook.shimmer.ShimmerFrameLayout>
+
+        <com.facebook.shimmer.ShimmerFrameLayout
+            android:id="@+id/main_view_country_shimmer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/small_spacing"
+            android:visibility="gone"
+            app:shimmer_auto_start="false">
+
+            <TextView
+                android:id="@+id/main_view_country"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Country: Nigeria"
+                android:textColor="@color/default_font_color"
+                android:visibility="visible" />
 
         </com.facebook.shimmer.ShimmerFrameLayout>
 
@@ -105,7 +117,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="@dimen/extra_large_spacing"
         android:enabled="false"
-        android:text="@string/capture_image"
+        android:text="@string/analyze_image"
         android:textAllCaps="false"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
