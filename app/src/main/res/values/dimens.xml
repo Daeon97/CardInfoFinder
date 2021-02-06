@@ -5,4 +5,5 @@
     <dimen name="large_spacing">32dp</dimen>
     <dimen name="extra_large_spacing">64dp</dimen>
     <dimen name="extra_extra_large_spacing">128dp</dimen>
+    <dimen name="extremely_large_spacing">356dp</dimen>
 </resources>

@@ -15,4 +15,5 @@
     <string name="error_occurred_while_opening_camera">An error occurred while opening camera</string>
     <string name="enter_manually">Enter manually</string>
     <string name="enter_card_details">Enter at least the first 8 digits of your card number</string>
+    <string name="analyzing">Analyzing…</string>
 </resources>

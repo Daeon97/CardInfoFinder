@@ -8,4 +8,5 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="default_font_color">#373737</color>
+    <color name="lighter_gray">#F1ECEC</color>
 </resources>
