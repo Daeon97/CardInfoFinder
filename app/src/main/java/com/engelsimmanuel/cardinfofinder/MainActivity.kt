@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.Button
+import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.camera.core.*
@@ -37,6 +38,7 @@ import java.util.concurrent.Executors
 class MainActivity : AppCompatActivity() {
     private lateinit var viewFinder: PreviewView
     private lateinit var analyzing: ProgressBar
+    private lateinit var analysisError: ImageView
     private lateinit var positionInstruction: TextView
     private lateinit var gottenCardDetailsTextInputLayout: TextInputLayout
     private lateinit var gottenCardDetails: TextInputEditText
@@ -62,6 +64,7 @@ class MainActivity : AppCompatActivity() {
 
         viewFinder = findViewById(R.id.main_view_camera_preview)
         analyzing = findViewById(R.id.main_view_analyzing)
+        analysisError = findViewById(R.id.main_view_analysis_error);
         positionInstruction = findViewById(R.id.main_view_position_instruction)
         gottenCardDetailsTextInputLayout =
             findViewById(R.id.main_view_gotten_card_details_text_input_layout)
@@ -223,7 +226,7 @@ class MainActivity : AppCompatActivity() {
                 positionInstruction.text = getString(R.string.enter_card_details)
                 positionInstruction.setTextColor(resources.getColor(android.R.color.holo_green_dark))
                 gottenCardDetailsTextInputLayout.visibility = View.VISIBLE
-                viewFinder.visibility = View.GONE
+                analysisError.visibility = View.GONE
                 cameraExecutor.shutdown()
                 analyze.text = getString(R.string.analyze)
             }
@@ -326,6 +329,8 @@ class MainActivity : AppCompatActivity() {
                     commons.log(tag = TAG, messageToLog = "analyze image onFailureListener")
                     positionInstruction.text = getString(R.string.exception_while_scanning_card)
                     positionInstruction.setTextColor(resources.getColor(android.R.color.holo_red_dark))
+                    analyzing.visibility = View.GONE
+                    analysisError.visibility = View.VISIBLE
                     analyze.text = getString(R.string.enter_manually)
                     analyze.isEnabled = true
                 }
