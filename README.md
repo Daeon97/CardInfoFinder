@@ -13,4 +13,3 @@ directories and sub directories.
 
 ### Built APK
 Kindly check the /app/build/outputs/apk/debug directory as it contains the built apk, app-debug.apk for installation purposes. Note that the app only supports Android 5.0 and later devices
-Kindly check the /app/build/outputs/apk/debug directory as it contains the built apk, app-debug.apk for installation purposes. Note that the app only supports Android 5.0 and later devices
